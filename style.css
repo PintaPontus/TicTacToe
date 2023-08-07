@@ -1,0 +1,57 @@
+html, body, .app{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+.app{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ttt-board{
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-direction: column;
+}
+
+
+.ttt-info{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 2em;
+}
+
+.ttt-cnt, .ttt-cnt>*{
+    text-align: center;
+}
+
+.ttt-turn{
+    font-size: 2em;
+}
+
+.ttt-grid{
+    grid-area: board-grid;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 0;
+    justify-items: stretch;
+    align-items: stretch;
+    height: 20rem;
+    width: 20rem;
+}
+
+.ttt-cell{
+    border: 1px solid black;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ttt-cell-label{
+    min-height: 1rem;
+}
