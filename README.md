@@ -15,5 +15,5 @@ trunk build
 
 ### Build Desktop
 ```shell
-trunk serve --open
+cargo tauri build
 ```
