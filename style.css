@@ -2,6 +2,12 @@ html, body, .app{
     width: 100vw;
     height: 100vh;
     margin: 0;
+    background-color: grey;
+}
+a{
+    text-decoration: none;
+    color: inherit;
+    font-weight: bold;
 }
 
 .app{
@@ -15,6 +21,8 @@ html, body, .app{
     align-items: stretch;
     justify-content: stretch;
     flex-direction: column;
+    gap: 15px;
+    text-align: center;
 }
 
 
@@ -23,6 +31,7 @@ html, body, .app{
     align-items: center;
     justify-content: space-between;
     font-size: 2em;
+    font-weight: bold;
 }
 
 .ttt-cnt, .ttt-cnt>*{
@@ -34,6 +43,7 @@ html, body, .app{
 }
 
 .ttt-grid{
+    border: 1px solid black;
     grid-area: board-grid;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -52,6 +62,11 @@ html, body, .app{
     justify-content: center;
 }
 
-.ttt-cell-label{
+.ttt-label{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     min-height: 1rem;
 }

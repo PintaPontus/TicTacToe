@@ -2,8 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TicTacToe</title>
+    <title>Leptos TicTacToe</title>
     <link data-trunk rel="scss" href="style.css">
+    <link data-trunk rel="copy-dir" href="assets"/>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqYrekXJy8HERtBQK5jbeo7uF4HGBUSuk",
+            authDomain: "leptos-tictactoe.firebaseapp.com",
+            projectId: "leptos-tictactoe",
+            storageBucket: "leptos-tictactoe.appspot.com",
+            messagingSenderId: "459366343306",
+            appId: "1:459366343306:web:2e808abd645f0134b10373"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    </script>
 </head>
 <body>
 

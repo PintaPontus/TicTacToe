@@ -99,6 +99,17 @@ pub fn Board(cx: Scope) -> impl IntoView {
             <Counter player=Player::O score=counterO/>
         </div>
         <Grid win=win/>
+        <a href="https://github.com/PintaPontus/TicTacToe">
+            <div class="ttt-label">
+                    <div>
+                        <img src="assets/github_logo.svg" alt="GitHub"/>
+                    </div>
+                    <div>
+                        GitHub
+                    </div>
+
+            </div>
+        </a>
         </div>
     }
 }
@@ -208,7 +219,7 @@ fn Cell<F>(
                 on_fill();
             }
         }>
-            <div class="ttt-cell-label">
+            <div class="ttt-label">
             {move || Player::check_player(grid.get()[coord/GRID_DIM][coord%GRID_DIM])}
             </div>
         </div>
