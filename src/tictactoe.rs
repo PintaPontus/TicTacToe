@@ -111,17 +111,11 @@ fn Grid<F>(
     let grid : RwSignal<[[Option<Player>; GRID_DIM]; GRID_DIM]>= create_rw_signal(cx, [[None; GRID_DIM]; GRID_DIM]);
 
     let fill_cell = move |c: usize| {
-        log!("COORD: {}", c);
         let actual_player = Player::select_player(turn.get());
         grid.update(|g| g[c/GRID_DIM][c%GRID_DIM] = Some(actual_player));
-        log!("CELL: {}", Player::check_player(grid.get()[c/GRID_DIM][c%GRID_DIM]));
-        log!("[{}][{}][{}]", Player::check_player(grid.get()[0][0]), Player::check_player(grid.get()[0][1]), Player::check_player(grid.get()[0][2]));
-        log!("[{}][{}][{}]", Player::check_player(grid.get()[1][0]), Player::check_player(grid.get()[1][1]), Player::check_player(grid.get()[1][2]));
-        log!("[{}][{}][{}]", Player::check_player(grid.get()[2][0]), Player::check_player(grid.get()[2][1]), Player::check_player(grid.get()[2][2]));
         let mut has_won = true;
         (0..GRID_DIM).for_each(|i| {
             let cell_value = grid.get()[c/GRID_DIM][i].unwrap_or(Player::select_player(!turn.get()));
-            log!("[{}][{}] - {}", c/GRID_DIM, i, cell_value);
             match (actual_player, cell_value) {
                 (Player::X, Player::X) => {},
                 (Player::O, Player::O) => {},
@@ -136,7 +130,6 @@ fn Grid<F>(
         }
         (0..GRID_DIM).for_each(|i| {
             let cell_value = grid.get()[i][c%GRID_DIM].unwrap_or(Player::select_player(!turn.get()));
-            log!("[{}][{}] - {}", i, c%GRID_DIM, cell_value);
             match (actual_player, cell_value) {
                 (Player::X, Player::X) => {},
                 (Player::O, Player::O) => {},
