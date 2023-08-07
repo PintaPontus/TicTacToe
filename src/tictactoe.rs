@@ -1,4 +1,5 @@
 use std::fmt;
+use rand::Rng;
 
 use leptos::*;
 
@@ -66,41 +67,47 @@ fn Counter(cx: Scope,
 #[component]
 pub fn Board(cx: Scope) -> impl IntoView {
     let (turn, set_turn) = create_signal(cx, true);
+    let win: RwSignal<Option<Player>> = create_rw_signal(cx, None);
     provide_context(cx, turn);
     provide_context(cx, set_turn);
 
     let (counterX, set_counterX) = create_signal(cx, 0);
     let (counterO, set_counterO) = create_signal(cx, 0);
 
-    let score = move |cnt: WriteSignal<i32>| {
-        cnt.update(|n| {*n = (*n)+1})
-    };
-
-    let win_match = move || {
-        match Player::select_player(turn.get()) {
-            Player::X => {score(set_counterX);}
-            Player::O => {score(set_counterO);}
+    let win_match = move |p| {
+        match p {
+            Player::X => {set_counterX.update(|n| {*n = (*n)+1})}
+            Player::O => {set_counterO.update(|n| {*n = (*n)+1})}
         }
     };
+
+    create_effect(cx, move |_| {
+        if win.get().is_some() {
+            win_match(win.get().unwrap());
+        }
+        log!("X:{} - O:{}", counterX.get(), counterO.get());
+    });
 
     view! { cx, <div class="ttt-board">
         <div class="ttt-info">
             <Counter player=Player::X score=counterX/>
             <div class="ttt-turn">
-                {move || Player::select_player(turn.get()).to_string() }
+                {move ||
+                    Player::select_player(turn.get()).to_string()
+                }
             </div>
             <Counter player=Player::O score=counterO/>
         </div>
-        <Grid on_win=win_match/>
+        <Grid win=win/>
         </div>
     }
 }
 
 #[component]
-fn Grid<F>(
+fn Grid(
     cx: Scope,
-    on_win: F
-) -> impl IntoView where F: Fn() + 'static{
+    win: RwSignal<Option<Player>>
+) -> impl IntoView{
 
     let turn = use_context::<ReadSignal<bool>>(cx)
         .expect("to have found the getter provided");
@@ -113,34 +120,63 @@ fn Grid<F>(
     let fill_cell = move |c: usize| {
         let actual_player = Player::select_player(turn.get());
         grid.update(|g| g[c/GRID_DIM][c%GRID_DIM] = Some(actual_player));
-        let mut has_won = true;
-        (0..GRID_DIM).for_each(|i| {
-            let cell_value = grid.get()[c/GRID_DIM][i].unwrap_or(Player::select_player(!turn.get()));
-            match (actual_player, cell_value) {
-                (Player::X, Player::X) => {},
-                (Player::O, Player::O) => {},
-                _ => has_won = false,
+        let take_value = move |x: usize, y: usize| {
+            return grid.get()[x][y].unwrap_or(Player::select_player(!turn.get()));
+        };
+        let match_players = |pa: Player, pb: Player| {
+            match (pa, pb) {
+                (Player::X, Player::X) => true,
+                (Player::O, Player::O) => true,
+                _ => false,
             }
-        });
-        if has_won {
-            log!("VINTO");
-            // (on_win)();
-        } else {
-            has_won = true;
+        };
+
+        let on_win = || {
+            grid.set([[None; GRID_DIM]; GRID_DIM]);
+            win.set(Some(actual_player));
+            let coin_flip = rand::thread_rng().gen_range(0..2) >= 1;
+            set_turn.set(coin_flip);
+        };
+
+        let on_draw = || {
+            grid.set([[None; GRID_DIM]; GRID_DIM]);
+            let coin_flip = rand::thread_rng().gen_range(0..2) >= 1;
+            set_turn.set(coin_flip);
+        };
+
+        if (0..GRID_DIM).filter(|i| {
+            let cell_value = take_value(c/GRID_DIM,*i);
+            return match_players(actual_player, cell_value);
+        }).count() == GRID_DIM {
+            on_win();
+            return;
         }
-        (0..GRID_DIM).for_each(|i| {
-            let cell_value = grid.get()[i][c%GRID_DIM].unwrap_or(Player::select_player(!turn.get()));
-            match (actual_player, cell_value) {
-                (Player::X, Player::X) => {},
-                (Player::O, Player::O) => {},
-                _ => has_won = false,
-            }
-        });
-        if has_won {
-            log!("VINTO");
-            // (on_win)();
-        } else {
-            has_won = true;
+        if (0..GRID_DIM).filter(|i| {
+            let cell_value = take_value(*i,c%GRID_DIM);
+            return match_players(actual_player, cell_value);
+        }).count() == GRID_DIM {
+            on_win();
+            return;
+        }
+        if (0..GRID_DIM).filter(|i| {
+            let cell_value = take_value(*i,*i);
+            return match_players(actual_player, cell_value);
+        }).count() == GRID_DIM {
+            on_win();
+            return;
+        }
+        if (0..GRID_DIM).filter(|i| {
+            let cell_value = take_value(*i,GRID_DIM-(*i)-1);
+            return match_players(actual_player, cell_value);
+        }).count() == GRID_DIM {
+            on_win();
+            return;
+        }
+        if(0..(GRID_DIM*GRID_DIM)).filter(|i|{
+            grid.get()[i/GRID_DIM][i%GRID_DIM].is_some()
+        }).count() == (GRID_DIM*GRID_DIM){
+            on_draw();
+            return;
         }
 
         set_turn.update(|t| *t=!(*t));
@@ -149,10 +185,8 @@ fn Grid<F>(
     view! { cx, <div class="ttt-grid">
         {(0..9).into_iter()
         .map(|i| {
-            log!("Iter: {}", i);
-
             view! {cx,
-                <Cell on_fill=move || {fill_cell(i); !turn.get()} />
+                <Cell coord=i grid=grid on_fill=move || {fill_cell(i)} />
             }
         })
         .collect::<Vec<_>>()}
@@ -163,18 +197,19 @@ fn Grid<F>(
 #[component]
 fn Cell<F>(
     cx: Scope,
+    coord: usize,
+    grid: RwSignal<[[Option<Player>; GRID_DIM]; GRID_DIM]>,
     on_fill: F
-) -> impl IntoView where F: Fn() -> bool + 'static{
-    let (symbol, set_symbol) = create_signal::<Option<Player>>(cx, None);
+) -> impl IntoView where F: Fn() + 'static{
 
     view! { cx, <div class="ttt-cell"
         on:click = move |_| {
-            if symbol.get().is_none() {
-                set_symbol.set(Some(Player::select_player(on_fill())));
+            if grid.get()[coord/GRID_DIM][coord%GRID_DIM].is_none() {
+                on_fill();
             }
         }>
             <div class="ttt-cell-label">
-            {move || Player::check_player(symbol.get())}
+            {move || Player::check_player(grid.get()[coord/GRID_DIM][coord%GRID_DIM])}
             </div>
         </div>
     }
