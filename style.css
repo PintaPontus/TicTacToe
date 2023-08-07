@@ -3,6 +3,7 @@ html, body, .app{
     height: 100vh;
     margin: 0;
     background-color: grey;
+    font-family: 'Roboto', sans-serif;
 }
 a{
     text-decoration: none;
@@ -60,6 +61,8 @@ a{
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 4em;
+    font-weight: bold;
 }
 
 .ttt-label{
@@ -68,5 +71,5 @@ a{
     align-items: center;
     justify-content: center;
     gap: 10px;
-    min-height: 1rem;
+    min-height: 1.5em;
 }
