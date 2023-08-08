@@ -73,3 +73,7 @@ a{
     gap: 10px;
     min-height: 1.5em;
 }
+
+.ttt-refresh{
+    cursor: pointer;
+}

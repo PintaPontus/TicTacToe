@@ -107,9 +107,13 @@ pub fn Board(cx: Scope) -> impl IntoView {
                     <div>
                         GitHub
                     </div>
-
             </div>
         </a>
+        <span class="material-symbols-outlined ttt-refresh"
+            on:click=move |_| { window().location().reload().unwrap(); }
+        >
+            refresh
+        </span>
         </div>
     }
 }
